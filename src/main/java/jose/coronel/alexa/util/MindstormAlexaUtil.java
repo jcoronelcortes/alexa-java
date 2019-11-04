@@ -20,16 +20,16 @@ import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Util {
+public class MindstormAlexaUtil {
 
-    private static Logger log = getLogger(Util.class);
+    private static Logger log = getLogger(MindstormAlexaUtil.class);
 
     public static String NAMESPACE = "Custom.Mindstorms.Gadget";
     public static String NAME_CONTROL = "control";
 
 
     public static EveGadget getConnectedEndpoints(String apiEndpoint, String apiAccessToken) throws Exception {
-        log.info("Get connected EV3 endpoint");
+        log.info("Obteniendo endpoint del EV3 conectado");
         String url = apiEndpoint + "/v1/endpoints";
         log.info("URL : {}", url);
         log.info("Api Access Token : {}", apiAccessToken);
@@ -45,17 +45,17 @@ public class Util {
         try {
             jsonResponse = response.get().getResponseBody();
         } catch (InterruptedException e) {
-            log.error("Error message : {}", e.getMessage(), e);
+            log.error("Mensaje de error : {}", e.getMessage(), e);
             throw new Exception(e);
         } catch (ExecutionException e) {
-            log.error("Error message : {}", e.getMessage(), e);
+            log.error("Mensaje de error : {}", e.getMessage(), e);
             throw new Exception(e);
         }
-        log.info("EV3 Response : {}",  jsonResponse);
+        log.info("Respuesta del EV3 : {}",  jsonResponse);
         try {
             return new ObjectMapper().readValue(jsonResponse, EveGadget.class);
         } catch (IOException e) {
-            log.error("Error message : {}", e.getMessage(), e);
+            log.error("Mensaje de error : {}", e.getMessage(), e);
             throw new Exception(e);
         }
     }

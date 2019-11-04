@@ -3,6 +3,7 @@ package jose.coronel.alexa;
 import com.amazon.ask.Skill;
 import com.amazon.ask.SkillStreamHandler;
 import com.amazon.ask.Skills;
+import jose.coronel.alexa.handlers.common.LaunchRequestHandler;
 import jose.coronel.alexa.handlers.common.*;
 import jose.coronel.alexa.handlers.mindstom.MoveIntentHandler;
 import jose.coronel.alexa.handlers.mindstom.SetCommandIntentHandler;

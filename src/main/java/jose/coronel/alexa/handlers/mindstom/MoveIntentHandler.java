@@ -5,24 +5,35 @@ import com.amazon.ask.dispatcher.request.handler.impl.IntentRequestHandler;
 import com.amazon.ask.model.IntentRequest;
 import com.amazon.ask.model.Response;
 import jose.coronel.alexa.handlers.mindstom.directive.MoveIntentDirective;
-import jose.coronel.alexa.util.Util;
+import jose.coronel.alexa.util.MindstormAlexaUtil;
+import org.slf4j.Logger;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.amazon.ask.request.Predicates.intentName;
 import static com.amazon.ask.request.Predicates.requestType;
+import static jose.coronel.alexa.util.I18NUtil.getLocale;
+import static jose.coronel.alexa.util.I18NUtil.i18n;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class MoveIntentHandler implements IntentRequestHandler {
 
+    private static Logger log = getLogger(MoveIntentHandler.class);
+
     @Override
     public boolean canHandle(HandlerInput input, IntentRequest intentRequest) {
-        return input.matches(requestType(IntentRequest.class).and(intentName("MoveIntent")));
+        Locale locale = getLocale(input);
+        return input.matches(requestType(IntentRequest.class).and(intentName(i18n(locale, "moveIntent"))));
     }
 
     @Override
     public Optional<Response> handle(HandlerInput handlerInput, IntentRequest intentRequest) {
-        String direction = intentRequest.getIntent().getSlots().get("Direction").getValue();
-        String duration = intentRequest.getIntent().getSlots().get("Duration").getValue();
+        log.info("Mover Intent");
+        Locale locale = getLocale(handlerInput);
+        String direction = intentRequest.getIntent().getSlots().get(i18n(locale, "direction")).getValue();
+        String duration = intentRequest.getIntent().getSlots().get(i18n(locale, "duration")).getValue();
+        log.info("Direccion : {} - Duracion : {}", direction, duration);
         if(duration == null || duration.isEmpty()){
             // Duration is optional, use default if not available
             duration = "2";
@@ -32,6 +43,7 @@ public class MoveIntentHandler implements IntentRequestHandler {
             // speed is optional, use default if not available
             speed = "50";
         }
+        log.info("Velocidad : {}", speed);
         String endpointId = (String) handlerInput.getAttributesManager().getSessionAttributes().get("endpointId");
         if(endpointId == null ){
             // endpointId is optional, use default if not available
@@ -41,17 +53,17 @@ public class MoveIntentHandler implements IntentRequestHandler {
         MoveIntentDirective payload = new MoveIntentDirective("move", direction, Integer.parseInt(duration), Integer.parseInt(speed));
 
         String speechOutput;
-        if(direction.equals("brake")){
-            speechOutput = "Applying brake";
+        if(direction.equals(i18n(locale, "brake"))){
+            speechOutput = i18n(locale, "brakeSpeechOutput");
         }
         else{
-            speechOutput = direction + " " + duration + " seconds at " + speed + " percent speed";
+            speechOutput = i18n(locale, "moveSpeechOutput", direction, duration, speed);
         }
-
+        log.info("Respuesta de Alexa : '{}'", speechOutput);
         return handlerInput.getResponseBuilder()
                 .withSpeech(speechOutput)
-                .withReprompt("awaiting command")
-                .addDirective(Util.buildDirective(endpointId, Util.NAMESPACE, Util.NAME_CONTROL, payload))
+                .withReprompt(i18n(locale, "reprompt"))
+                .addDirective(MindstormAlexaUtil.buildDirective(endpointId, MindstormAlexaUtil.NAMESPACE, MindstormAlexaUtil.NAME_CONTROL, payload))
                 .build();
     }
 
